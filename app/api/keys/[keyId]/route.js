@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server';
-import { apiKeys } from '../route';
+import { apiKeysStore } from '../route';
 
 export async function DELETE(request, { params }) {
   try {
     const { keyId } = await params;
     
-    const keyIndex = apiKeys.findIndex(key => key.id === keyId);
-    if (keyIndex === -1) {
+    if (!apiKeysStore.has(keyId)) {
       return NextResponse.json(
         { message: 'API key not found' },
         { status: 404 }
       );
     }
 
-    apiKeys.splice(keyIndex, 1);
+    // Delete the key from the Map
+    apiKeysStore.delete(keyId);
     return NextResponse.json({ message: 'API key deleted successfully' });
   } catch (error) {
     console.error('Delete error:', error);
@@ -37,21 +37,24 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    const keyIndex = apiKeys.findIndex(key => key.id === keyId);
-    if (keyIndex === -1) {
+    if (!apiKeysStore.has(keyId)) {
       return NextResponse.json(
         { message: 'API key not found' },
         { status: 404 }
       );
     }
 
-    apiKeys[keyIndex] = {
-      ...apiKeys[keyIndex],
+    const existingKey = apiKeysStore.get(keyId);
+    const updatedKey = {
+      ...existingKey,
       name,
       updatedAt: new Date().toISOString()
     };
 
-    return NextResponse.json(apiKeys[keyIndex]);
+    // Update the key in the Map
+    apiKeysStore.set(keyId, updatedKey);
+
+    return NextResponse.json(updatedKey);
   } catch (error) {
     console.error('Update error:', error);
     return NextResponse.json(

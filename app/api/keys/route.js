@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
-// Export the apiKeys array so it can be shared between route handlers
-export const apiKeys = [];
+// Create a Map to store API keys with better state management
+const apiKeysStore = new Map();
 
 export async function GET() {
-  return NextResponse.json({ keys: apiKeys });
+  // Convert Map values to array for response
+  const keys = Array.from(apiKeysStore.values());
+  return NextResponse.json({ keys });
 }
 
 export async function POST(request) {
@@ -27,7 +29,8 @@ export async function POST(request) {
       createdAt: new Date().toISOString(),
     };
 
-    apiKeys.push(newKey);
+    // Store the new key in our Map
+    apiKeysStore.set(newKey.id, newKey);
 
     return NextResponse.json(newKey);
   } catch (error) {
@@ -37,3 +40,6 @@ export async function POST(request) {
     );
   }
 }
+
+// Export the store for other route handlers
+export { apiKeysStore };
