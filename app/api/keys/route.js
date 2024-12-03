@@ -13,7 +13,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name } = body;
+    const { name, monthlyLimit } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -26,6 +26,7 @@ export async function POST(request) {
       id: uuidv4(),
       name,
       key: `sk_${uuidv4().replace(/-/g, '')}`,
+      monthlyLimit: monthlyLimit || 1000,
       createdAt: new Date().toISOString(),
     };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import CreateApiKeyModal from './CreateApiKeyModal';
 
 // Simple SVG icons as components
 const EyeIcon = () => (
@@ -38,7 +39,7 @@ const TrashIcon = () => (
 export default function ApiKeyManager() {
   const [apiKeys, setApiKeys] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [newKeyName, setNewKeyName] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [editingKey, setEditingKey] = useState(null);
   const [editName, setEditName] = useState('');
@@ -60,9 +61,8 @@ export default function ApiKeyManager() {
     }
   };
 
-  const createApiKey = async (e) => {
-    e.preventDefault();
-    if (!newKeyName.trim()) {
+  const createApiKey = async ({ name, monthlyLimit }) => {
+    if (!name.trim()) {
       toast.error('Please enter a key name');
       return;
     }
@@ -72,13 +72,13 @@ export default function ApiKeyManager() {
       const response = await fetch('/api/keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newKeyName }),
+        body: JSON.stringify({ name, monthlyLimit }),
       });
       const data = await response.json();
       
       if (response.ok) {
         toast.success('API key created successfully');
-        setNewKeyName('');
+        setIsModalOpen(false);
         fetchApiKeys();
       } else {
         throw new Error(data.message || 'Failed to create API key');
@@ -199,39 +199,18 @@ export default function ApiKeyManager() {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-gray-900">API Keys</h3>
           <button
-            onClick={() => document.getElementById('createKeyForm').classList.remove('hidden')}
+            onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
           >
             + Create New Key
           </button>
         </div>
 
-        {/* Create Key Form - Updated colors */}
-        <form id="createKeyForm" onSubmit={createApiKey} className="hidden mb-6 p-4 border rounded-lg bg-white">
-          <div className="flex gap-4">
-            <input
-              type="text"
-              value={newKeyName}
-              onChange={(e) => setNewKeyName(e.target.value)}
-              placeholder="Enter API key name"
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-            />
-            <button
-              type="submit"
-              disabled={isCreating}
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all disabled:opacity-50"
-            >
-              {isCreating ? 'Creating...' : 'Create API Key'}
-            </button>
-            <button
-              type="button"
-              onClick={() => document.getElementById('createKeyForm').classList.add('hidden')}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-gray-700"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+        <CreateApiKeyModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={createApiKey}
+        />
 
         {/* API Keys Table - Updated colors */}
         <div className="border rounded-lg overflow-hidden bg-white">
