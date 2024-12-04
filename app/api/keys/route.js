@@ -1,13 +1,24 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-
-// Create a Map to store API keys with better state management
-const apiKeysStore = new Map();
+import { supabase } from '@/lib/supabase';
 
 export async function GET() {
-  // Convert Map values to array for response
-  const keys = Array.from(apiKeysStore.values());
-  return NextResponse.json({ keys });
+  try {
+    const { data: keys, error } = await supabase
+      .from('api_keys')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return NextResponse.json({ keys });
+  } catch (error) {
+    console.error('Error fetching keys:', error);
+    return NextResponse.json(
+      { message: 'Failed to fetch API keys' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request) {
@@ -23,24 +34,26 @@ export async function POST(request) {
     }
 
     const newKey = {
-      id: uuidv4(),
       name,
       key: `sk_${uuidv4().replace(/-/g, '')}`,
-      monthlyLimit: monthlyLimit || 1000,
-      createdAt: new Date().toISOString(),
+      monthly_limit: monthlyLimit || 1000,
+      usage: 0,
     };
 
-    // Store the new key in our Map
-    apiKeysStore.set(newKey.id, newKey);
+    const { data, error } = await supabase
+      .from('api_keys')
+      .insert([newKey])
+      .select()
+      .single();
 
-    return NextResponse.json(newKey);
+    if (error) throw error;
+
+    return NextResponse.json(data);
   } catch (error) {
+    console.error('Error creating key:', error);
     return NextResponse.json(
       { message: 'Failed to create API key' },
       { status: 500 }
     );
   }
 }
-
-// Export the store for other route handlers
-export { apiKeysStore };
