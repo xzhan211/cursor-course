@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server';
-import { apiKeysStore } from '../route';
+import { supabase } from '@/lib/supabase';
 
 export async function DELETE(request, { params }) {
   try {
     const { keyId } = await params;
     
-    if (!apiKeysStore.has(keyId)) {
-      return NextResponse.json(
-        { message: 'API key not found' },
-        { status: 404 }
-      );
-    }
+    const { error } = await supabase
+      .from('api_keys')
+      .delete()
+      .eq('id', keyId);
 
-    // Delete the key from the Map
-    apiKeysStore.delete(keyId);
+    if (error) throw error;
+
     return NextResponse.json({ message: 'API key deleted successfully' });
   } catch (error) {
     console.error('Delete error:', error);
@@ -27,8 +25,7 @@ export async function DELETE(request, { params }) {
 export async function PATCH(request, { params }) {
   try {
     const { keyId } = await params;
-    const body = await request.json();
-    const { name } = body;
+    const { name } = await request.json();
 
     if (!name) {
       return NextResponse.json(
@@ -37,24 +34,19 @@ export async function PATCH(request, { params }) {
       );
     }
 
-    if (!apiKeysStore.has(keyId)) {
-      return NextResponse.json(
-        { message: 'API key not found' },
-        { status: 404 }
-      );
-    }
+    const { data, error } = await supabase
+      .from('api_keys')
+      .update({ 
+        name,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', keyId)
+      .select()
+      .single();
 
-    const existingKey = apiKeysStore.get(keyId);
-    const updatedKey = {
-      ...existingKey,
-      name,
-      updatedAt: new Date().toISOString()
-    };
+    if (error) throw error;
 
-    // Update the key in the Map
-    apiKeysStore.set(keyId, updatedKey);
-
-    return NextResponse.json(updatedKey);
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Update error:', error);
     return NextResponse.json(
