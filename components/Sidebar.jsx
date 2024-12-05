@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
 
 const NavItem = ({ href, children, isActive }) => {
   return (
@@ -25,25 +24,6 @@ export default function Sidebar() {
   return (
     <div className="w-64 h-screen border-r bg-white fixed left-0 top-0">
       <div className="p-6">
-        {/* Logo */}
-        <div className="mb-8">
-          <Image
-            src="/logo.png"  // Make sure to add your logo to the public folder
-            alt="Logo"
-            width={120}
-            height={40}
-            className="w-auto h-8"
-          />
-        </div>
-
-        {/* Account Selector */}
-        <div className="mb-8">
-          <select className="w-full px-3 py-2 bg-white border rounded-lg text-sm text-gray-700">
-            <option>Personal</option>
-            {/* Add more options as needed */}
-          </select>
-        </div>
-
         {/* Navigation */}
         <nav className="space-y-1">
           <NavItem 
