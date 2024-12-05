@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import CreateApiKeyModal from './CreateApiKeyModal';
+import CopyNotification from './CopyNotification';
 
 // Simple SVG icons as components
 const EyeIcon = () => (
@@ -44,6 +45,7 @@ export default function ApiKeyManager() {
   const [editingKey, setEditingKey] = useState(null);
   const [editName, setEditName] = useState('');
   const [revealedKeys, setRevealedKeys] = useState({});
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
 
   useEffect(() => {
     fetchApiKeys();
@@ -155,7 +157,10 @@ export default function ApiKeyManager() {
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('API key copied to clipboard');
+      setShowCopyNotification(true);
+      setTimeout(() => {
+        setShowCopyNotification(false);
+      }, 3000);
     } catch (err) {
       toast.error('Failed to copy API key');
     }
@@ -171,6 +176,11 @@ export default function ApiKeyManager() {
 
   return (
     <div className="space-y-8">
+      <CopyNotification 
+        isVisible={showCopyNotification}
+        onClose={() => setShowCopyNotification(false)}
+      />
+
       {/* Header Section - Updated colors */}
       <div className="bg-gradient-to-r from-rose-100 via-purple-100 to-blue-100 rounded-xl p-8">
         <div className="flex justify-between items-start mb-6">
