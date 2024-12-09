@@ -57,8 +57,8 @@ export default function Sidebar() {
           </NavItem>
 
           <NavItem 
-            href="/api-playground" 
-            isActive={pathname === '/api-playground'}
+            href="/playground" 
+            isActive={pathname === '/playground'}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
