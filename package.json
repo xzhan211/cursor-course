@@ -2,6 +2,7 @@
   "name": "xiaoyang",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +11,12 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@jridgewell/gen-mapping": "0.3.3",
+    "@langchain/community": "^0.3.17",
+    "@langchain/core": "^0.3.22",
+    "@langchain/openai": "^0.3.14",
     "@supabase/supabase-js": "^2.46.2",
+    "langchain": "^0.3.6",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
@@ -18,10 +24,16 @@
     "react-icons": "^5.4.0",
     "uuid": "^11.0.3"
   },
+  "resolutions": {
+    "@langchain/core": "0.3.22",
+    "@jridgewell/gen-mapping": "0.3.3"
+  },
   "devDependencies": {
+    "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "~4.9.0"
   }
 }
