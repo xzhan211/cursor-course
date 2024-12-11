@@ -8,7 +8,7 @@ export async function DELETE(request, { params }) {
     const { error } = await supabase
       .from('api_keys')
       .delete()
-      .eq('id', keyId);
+      .eq('key', keyId);
 
     if (error) throw error;
 
