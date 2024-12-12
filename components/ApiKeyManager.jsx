@@ -129,21 +129,22 @@ export default function ApiKeyManager() {
   };
 
   const deleteApiKey = async (keyId) => {
-    if (!confirm('Are you sure you want to delete this API key?')) return;
-
     try {
       const response = await fetch(`/api/keys/${keyId}`, {
         method: 'DELETE',
       });
 
-      if (response.ok) {
-        toast.success('API key deleted successfully');
-        fetchApiKeys();
-      } else {
-        throw new Error('Failed to delete API key');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to delete API key');
       }
+
+      // Update the UI by removing the deleted key
+      setApiKeys(apiKeys.filter(key => key.id !== keyId));
+      toast.success('API key deleted successfully');
     } catch (error) {
-      toast.error(error.message);
+      console.error('Error deleting key:', error);
+      toast.error('Failed to delete API key');
     }
   };
 

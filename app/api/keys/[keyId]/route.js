@@ -3,20 +3,29 @@ import { supabase } from '@/lib/supabase';
 
 export async function DELETE(request, { params }) {
   try {
-    const { keyId } = await params;
-    
+    const { keyId } = params;
+
     const { error } = await supabase
       .from('api_keys')
       .delete()
-      .eq('key', keyId);
+      .eq('id', keyId);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error deleting key:', error);
+      return NextResponse.json(
+        { error: 'Failed to delete API key' },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({ message: 'API key deleted successfully' });
-  } catch (error) {
-    console.error('Delete error:', error);
     return NextResponse.json(
-      { message: 'Failed to delete API key' },
+      { message: 'API key deleted successfully' },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

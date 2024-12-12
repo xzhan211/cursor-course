@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { analyzeReadme } from '@/lib/chain';
 
 export async function POST(request) {
   try {
@@ -7,6 +8,7 @@ export async function POST(request) {
     const body = await request.json();
     const { githubUrl } = body;
     const apiKey = request.headers.get('x-api-key');
+    
     if (!apiKey) {
       return NextResponse.json(
         { error: 'API key is required' },
@@ -52,10 +54,7 @@ export async function POST(request) {
       const response = await fetch(readmeUrl);
       
       if (!response.ok) {
-        return NextResponse.json(
-          { error: 'Failed to fetch README from GitHub' },
-          { status: response.status }
-        );
+        throw new Error('Failed to fetch README from GitHub');
       }
 
       const readmeData = await response.json();
@@ -65,21 +64,21 @@ export async function POST(request) {
     }
 
     const readmeContent = await fetchGitHubReadme(githubUrl);
-    console.log(readmeContent);
-
+    const analysis = await analyzeReadme(readmeContent);
 
     return NextResponse.json({
-      message: 'Valid API key, GitHub summarization will be implemented',
+      message: 'GitHub repository analyzed successfully',
       url: githubUrl,
       keyId: keyData.id,
-      content: readmeContent
+      analysis
     });
 
   } catch (error) {
     console.error('Error in GitHub summarizer:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error.message || 'Internal server error' },
       { status: 500 }
     );
   }
 } 
+
