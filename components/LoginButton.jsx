@@ -8,7 +8,7 @@ export default function LoginButton() {
 
   if (session) {
     return (
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
           {session.user.image && (
             <Image
@@ -19,7 +19,7 @@ export default function LoginButton() {
               className="rounded-full"
             />
           )}
-          <p className="font-medium">Welcome, {session.user.name}</p>
+          <span className="font-medium">{session.user.name}</span>
         </div>
         <button
           onClick={() => signOut()}

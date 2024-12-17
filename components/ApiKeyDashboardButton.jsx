@@ -1,16 +1,23 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button"
+import { Key } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 
 export default function ApiKeyDashboardButton() {
-  const router = useRouter();
+  const { data: session } = useSession()
+
+  if (!session) {
+    return null
+  }
 
   return (
-    <button
-      onClick={() => router.push('/dashboard')}
-      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
-    >
-      Manage API Keys
-    </button>
-  );
+    <Link href="/dashboard">
+      <Button variant="outline">
+        <Key className="h-4 w-4 mr-2" />
+        Manage API Keys
+      </Button>
+    </Link>
+  )
 }

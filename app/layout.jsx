@@ -1,12 +1,12 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/components/AuthProvider";
+import { AuthProvider } from "../components/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Your App",
-  description: "Your app description",
+  title: "GitHub Analyzer - Xiaoyang",
+  description: "Analyze GitHub repositories with powerful insights and analytics",
 };
 
 export default function RootLayout({ children }) {
