@@ -14,7 +14,7 @@ export default function ApiKeyDashboardButton() {
 
   return (
     <Link href="/dashboard">
-      <Button variant="outline">
+      <Button variant="outline" className="whitespace-nowrap text-sm">
         <Key className="h-4 w-4 mr-2" />
         Manage API Keys
       </Button>
