@@ -18,9 +18,7 @@ export default function Header() {
             <li><Link href="#" className="text-gray-600 hover:text-primary">Docs</Link></li>
           </ul>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:block">
-              <ApiKeyDashboardButton />
-            </div>
+            <ApiKeyDashboardButton />
             <LoginButton />
           </div>
           <div className="w-full md:hidden mt-4 border-t pt-4">
