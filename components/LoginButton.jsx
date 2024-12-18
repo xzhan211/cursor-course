@@ -8,22 +8,22 @@ export default function LoginButton() {
 
   if (session) {
     return (
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2">
           {session.user.image && (
             <Image
               src={session.user.image}
               alt={session.user.name || 'Profile picture'}
-              width={40}
-              height={40}
+              width={32}
+              height={32}
               className="rounded-full"
             />
           )}
-          <span className="font-medium">{session.user.name}</span>
+          <span className="hidden sm:inline font-medium">{session.user.name}</span>
         </div>
         <button
           onClick={() => signOut()}
-          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+          className="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition-colors"
         >
           Sign Out
         </button>
@@ -34,9 +34,9 @@ export default function LoginButton() {
   return (
     <button
       onClick={() => signIn('google')}
-      className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
+      className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-gray-800 text-sm rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
     >
-      <svg className="w-5 h-5" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
         <path
           fill="currentColor"
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -54,7 +54,7 @@ export default function LoginButton() {
           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
         />
       </svg>
-      Sign in with Google
+      <span className="whitespace-nowrap">Sign in</span>
     </button>
   );
 } 

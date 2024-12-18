@@ -5,7 +5,7 @@ import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
 import Sidebar from '@/components/Sidebar';
 
 export default function DashboardLayout({ children }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gray-100 relative">
@@ -38,10 +38,10 @@ export default function DashboardLayout({ children }) {
         min-h-screen
         transition-all duration-300 ease-in-out
         ${isSidebarOpen ? 'ml-0 lg:ml-64' : 'ml-0'}
-        pt-16
+        w-full
       `}>
-        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
-          <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+        <div className="mx-auto w-full px-2 sm:px-4 lg:px-8 py-4 lg:py-8 pt-16">
+          <div className="bg-white rounded-lg shadow-sm p-3 sm:p-4 lg:p-6">
             {children}
           </div>
         </div>
