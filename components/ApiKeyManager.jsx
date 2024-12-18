@@ -37,7 +37,7 @@ const TrashIcon = () => (
   </svg>
 );
 
-export default function ApiKeyManager() {
+export default function ApiKeyManager({ displayMode = 'desktop' }) {
   const [apiKeys, setApiKeys] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -171,6 +171,94 @@ export default function ApiKeyManager() {
     return `${key.slice(0, 3)}${'•'.repeat(30)}${key.slice(-4)}`;
   };
 
+  const renderMobileView = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">API Keys</h3>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-all"
+          >
+            + Create New Key
+          </button>
+        </div>
+
+        {apiKeys.map((key) => (
+          <div key={key.id} className="bg-white rounded-lg border p-4 space-y-3">
+            <div className="flex justify-between items-start">
+              {editingKey === key.id ? (
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                />
+              ) : (
+                <span className="font-medium text-gray-900">{key.name}</span>
+              )}
+              <span className="text-sm text-gray-500">Usage: 0</span>
+            </div>
+            
+            <div className="font-mono text-sm text-gray-900 break-all">
+              {revealedKeys[key.id] ? key.key : maskApiKey(key.key)}
+            </div>
+
+            <div className="flex justify-start gap-3 pt-2">
+              {editingKey === key.id ? (
+                <>
+                  <button
+                    onClick={() => updateApiKey(key.id)}
+                    className="text-sm text-green-600 hover:text-green-700 font-medium"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={cancelEditing}
+                    className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => toggleKeyVisibility(key.id)}
+                    className="text-gray-500 hover:text-gray-700"
+                    title={revealedKeys[key.id] ? "Hide API Key" : "Show API Key"}
+                  >
+                    {revealedKeys[key.id] ? <EyeSlashIcon /> : <EyeIcon />}
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard(key.key)}
+                    className="text-gray-500 hover:text-gray-700"
+                    title="Copy to Clipboard"
+                  >
+                    <ClipboardIcon />
+                  </button>
+                  <button
+                    onClick={() => startEditing(key)}
+                    className="text-gray-500 hover:text-gray-700"
+                    title="Edit"
+                  >
+                    <PencilIcon />
+                  </button>
+                  <button
+                    onClick={() => deleteApiKey(key.id)}
+                    className="text-gray-500 hover:text-red-600"
+                    title="Delete"
+                  >
+                    <TrashIcon />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return <div className="animate-pulse">Loading...</div>;
   }
@@ -182,8 +270,8 @@ export default function ApiKeyManager() {
         onClose={() => setShowCopyNotification(false)}
       />
 
-      {/* Header Section - Updated colors */}
-      <div className="bg-gradient-to-r from-rose-100 via-purple-100 to-blue-100 rounded-xl p-8">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-rose-100 via-purple-100 to-blue-100 rounded-xl p-4 sm:p-8">
         <div className="flex justify-between items-start mb-6">
           <div>
             <span className="text-sm font-medium text-gray-600">CURRENT PLAN</span>
@@ -205,109 +293,112 @@ export default function ApiKeyManager() {
         </div>
       </div>
 
-      {/* API Keys Section - Updated colors */}
+      {/* API Keys Section */}
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">API Keys</h3>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
-          >
-            + Create New Key
-          </button>
-        </div>
+        {displayMode === 'mobile' ? renderMobileView() : (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">API Keys</h3>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+              >
+                + Create New Key
+              </button>
+            </div>
 
-        <CreateApiKeyModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={createApiKey}
-        />
-
-        {/* API Keys Table - Updated colors */}
-        <div className="border rounded-lg overflow-hidden bg-white">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Usage</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Key</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Options</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {apiKeys.map((key) => (
-                <tr key={key.id} className="bg-white hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    {editingKey === key.id ? (
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        className="px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                      />
-                    ) : (
-                      <span className="font-medium text-gray-900">{key.name}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">0</td>
-                  <td className="px-6 py-4 font-mono text-sm text-gray-900">
-                    {revealedKeys[key.id] ? key.key : maskApiKey(key.key)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => toggleKeyVisibility(key.id)}
-                        className="p-1 text-gray-500 hover:text-gray-700"
-                        title={revealedKeys[key.id] ? "Hide API Key" : "Show API Key"}
-                      >
-                        {revealedKeys[key.id] ? <EyeSlashIcon /> : <EyeIcon />}
-                      </button>
-                      <button
-                        onClick={() => copyToClipboard(key.key)}
-                        className="p-1 text-gray-500 hover:text-gray-700"
-                        title="Copy to Clipboard"
-                      >
-                        <ClipboardIcon />
-                      </button>
-                      {editingKey === key.id ? (
-                        <>
+            <div className="border rounded-lg overflow-hidden bg-white">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Usage</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Key</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Options</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {apiKeys.map((key) => (
+                    <tr key={key.id} className="bg-white hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        {editingKey === key.id ? (
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                          />
+                        ) : (
+                          <span className="font-medium text-gray-900">{key.name}</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-gray-700">0</td>
+                      <td className="px-6 py-4 font-mono text-sm text-gray-900">
+                        {revealedKeys[key.id] ? key.key : maskApiKey(key.key)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-end gap-2">
                           <button
-                            onClick={() => updateApiKey(key.id)}
-                            className="p-1 text-green-600 hover:text-green-700 font-medium"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={cancelEditing}
+                            onClick={() => toggleKeyVisibility(key.id)}
                             className="p-1 text-gray-500 hover:text-gray-700"
+                            title={revealedKeys[key.id] ? "Hide API Key" : "Show API Key"}
                           >
-                            Cancel
+                            {revealedKeys[key.id] ? <EyeSlashIcon /> : <EyeIcon />}
                           </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => startEditing(key)}
-                          className="p-1 text-gray-500 hover:text-gray-700"
-                          title="Edit"
-                        >
-                          <PencilIcon />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => deleteApiKey(key.id)}
-                        className="p-1 text-gray-500 hover:text-red-600"
-                        title="Delete"
-                      >
-                        <TrashIcon />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                          <button
+                            onClick={() => copyToClipboard(key.key)}
+                            className="p-1 text-gray-500 hover:text-gray-700"
+                            title="Copy to Clipboard"
+                          >
+                            <ClipboardIcon />
+                          </button>
+                          {editingKey === key.id ? (
+                            <>
+                              <button
+                                onClick={() => updateApiKey(key.id)}
+                                className="p-1 text-green-600 hover:text-green-700 font-medium"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={cancelEditing}
+                                className="p-1 text-gray-500 hover:text-gray-700"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => startEditing(key)}
+                              className="p-1 text-gray-500 hover:text-gray-700"
+                              title="Edit"
+                            >
+                              <PencilIcon />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => deleteApiKey(key.id)}
+                            className="p-1 text-gray-500 hover:text-red-600"
+                            title="Delete"
+                          >
+                            <TrashIcon />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
+
+      <CreateApiKeyModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={createApiKey}
+      />
     </div>
   );
 }
