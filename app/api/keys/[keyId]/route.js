@@ -3,7 +3,8 @@ import { supabase } from '@/lib/supabase';
 
 export async function DELETE(request, { params }) {
   try {
-    const { keyId } = params;
+    const resolvedParams = await params;
+    const keyId = resolvedParams.keyId;
 
     const { error } = await supabase
       .from('api_keys')
@@ -33,7 +34,8 @@ export async function DELETE(request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    const { keyId } = await params;
+    const resolvedParams = await params;
+    const keyId = resolvedParams.keyId;
     const { name } = await request.json();
 
     if (!name) {
