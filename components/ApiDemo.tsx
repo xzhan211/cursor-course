@@ -21,46 +21,40 @@ interface AnalysisResponse {
 
 export default function ApiDemo() {
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [payload, setPayload] = useState(JSON.stringify({
     githubUrl: "https://github.com/assafelovic/gpt-researcher"
   }, null, 2))
-  const [response, setResponse] = useState<AnalysisResponse>({
-    message: "GitHub repository analyzed successfully",
-    url: "https://github.com/assafelovic/gpt-researcher",
-    keyId: "472c6908-4a8e-45cc-b045-17ad5d360834",
-    analysis: {
-      summary: "GPT Researcher is an autonomous agent designed for comprehensive web and local research, providing detailed and unbiased research reports with citations. It aims to empower individuals and organizations with accurate and factual information through AI.",
-      cool_facts: [
-        "Utilizes 'planner' and 'execution' agents for research tasks",
-        "Generates research reports exceeding 2,000 words",
-        "Aggregates over 20 sources for objective conclusions",
-        "Offers frontend in lightweight and production-ready versions",
-        "Supports JavaScript-enabled web scraping"
-      ],
-      technologies: [
-        "Python",
-        "FastAPI",
-        "NextJS",
-        "Docker"
-      ],
-      purpose: "To address misinformation, speed, determinism, and reliability in research by offering stable performance and increased speed through parallelized agent work."
-    }
-  })
+  const [response, setResponse] = useState<AnalysisResponse | null>(null)
 
   const handleSubmit = async () => {
     try {
       setLoading(true)
-      // Simulate API call with a delay
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      setError(null)
+      
       const parsedPayload = JSON.parse(payload)
-      // In a real implementation, this would be an actual API call
-      setResponse({
-        ...response,
-        url: parsedPayload.githubUrl,
-        keyId: crypto.randomUUID()
+      
+      // Call the actual API endpoint
+      const res = await fetch('/api/github-summarizer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Update the demo API key to match the one in the route handler
+          'x-api-key': 'demo-api-key'
+        },
+        body: JSON.stringify(parsedPayload)
       })
-    } catch (error) {
-      console.error('Error:', error)
+
+      const data = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to analyze repository')
+      }
+
+      setResponse(data)
+    } catch (err: unknown) {
+      console.error('Error:', err)
+      setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -104,6 +98,9 @@ export default function ApiDemo() {
                     </>
                   )}
                 </Button>
+                {error && (
+                  <p className="mt-2 text-sm text-red-500">{error}</p>
+                )}
               </CardContent>
             </Card>
 
@@ -111,52 +108,58 @@ export default function ApiDemo() {
               <CardHeader>
                 <CardTitle>Response</CardTitle>
                 <CardDescription>
-                  Analysis results for {response.url}
+                  Analysis results for {response?.url || 'your repository'}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="pretty" className="w-full">
-                  <TabsList>
-                    <TabsTrigger value="pretty">Pretty</TabsTrigger>
-                    <TabsTrigger value="raw">Raw</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="pretty" className="space-y-6">
-                    <div>
-                      <h3 className="font-semibold mb-2">Summary</h3>
-                      <p className="text-gray-600">{response.analysis.summary}</p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-2">Cool Facts</h3>
-                      <ul className="list-disc list-inside text-gray-600">
-                        {response.analysis.cool_facts.map((fact, index) => (
-                          <li key={index}>{fact}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-2">Technologies</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {response.analysis.technologies.map((tech, index) => (
-                          <span 
-                            key={index}
-                            className="px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
-                          >
-                            {tech}
-                          </span>
-                        ))}
+                {response ? (
+                  <Tabs defaultValue="pretty" className="w-full">
+                    <TabsList>
+                      <TabsTrigger value="pretty">Pretty</TabsTrigger>
+                      <TabsTrigger value="raw">Raw</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="pretty" className="space-y-6">
+                      <div>
+                        <h3 className="font-semibold mb-2">Summary</h3>
+                        <p className="text-gray-600">{response.analysis.summary}</p>
                       </div>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-2">Purpose</h3>
-                      <p className="text-gray-600">{response.analysis.purpose}</p>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="raw">
-                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto">
-                      {JSON.stringify(response, null, 2)}
-                    </pre>
-                  </TabsContent>
-                </Tabs>
+                      <div>
+                        <h3 className="font-semibold mb-2">Cool Facts</h3>
+                        <ul className="list-disc list-inside text-gray-600">
+                          {response.analysis.cool_facts.map((fact, index) => (
+                            <li key={index}>{fact}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-2">Technologies</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {response.analysis.technologies.map((tech, index) => (
+                            <span 
+                              key={index}
+                              className="px-2 py-1 bg-primary/10 text-primary rounded-md text-sm"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-2">Purpose</h3>
+                        <p className="text-gray-600">{response.analysis.purpose}</p>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="raw">
+                      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto">
+                        {JSON.stringify(response, null, 2)}
+                      </pre>
+                    </TabsContent>
+                  </Tabs>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    Submit a request to see the analysis results
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
