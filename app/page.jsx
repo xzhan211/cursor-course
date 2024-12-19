@@ -3,6 +3,7 @@ import Hero from '../components/Hero'
 import Features from '../components/Features'
 import Pricing from '../components/Pricing'
 import Footer from '../components/Footer'
+import ApiDemo from '../components/ApiDemo'
 
 export default function LandingPage() {
   return (
@@ -11,6 +12,7 @@ export default function LandingPage() {
       <main>
         <Hero />
         <Features />
+        <ApiDemo />
         <Pricing />
       </main>
       <Footer />
