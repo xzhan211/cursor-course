@@ -12,7 +12,8 @@ export default function Pricing() {
         "Basic repository summary",
         "Star count tracking",
         "Community support"
-      ]
+      ],
+      comingSoon: false
     },
     {
       name: "Pro",
@@ -23,7 +24,8 @@ export default function Pricing() {
         "Historical star data",
         "Pull request importance scoring",
         "Email support"
-      ]
+      ],
+      comingSoon: true
     },
     {
       name: "Enterprise",
@@ -34,7 +36,8 @@ export default function Pricing() {
         "Advanced security features",
         "Dedicated account manager",
         "24/7 phone & email support"
-      ]
+      ],
+      comingSoon: true
     }
   ]
 
@@ -44,7 +47,12 @@ export default function Pricing() {
         <h2 className="text-3xl font-bold text-center mb-12">Simple, Transparent Pricing</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 md:px-0">
           {tiers.map((tier, index) => (
-            <Card key={index} className="flex flex-col">
+            <Card key={index} className="flex flex-col relative">
+              {tier.comingSoon && (
+                <div className="absolute top-0 right-0 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-bl">
+                  Coming Soon
+                </div>
+              )}
               <CardHeader>
                 <CardTitle>{tier.name}</CardTitle>
                 <CardDescription>
@@ -63,7 +71,10 @@ export default function Pricing() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full">{tier.name === "Enterprise" ? "Contact Sales" : "Get Started"}</Button>
+                <Button className="w-full" disabled={tier.comingSoon}>
+                  {tier.comingSoon ? "Coming Soon" : (tier.name === "Enterprise" ? "Contact Sales" : "Get Started")}
+                </Button>
+                {/* <Button className="w-full">{tier.name === "Enterprise" ? "Contact Sales" : "Get Started"}</Button> */}
               </CardFooter>
             </Card>
           ))}
